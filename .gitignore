@@ -1,0 +1,11 @@
+.DS_Store
+*.jar
+*.class
+!processing.jar
+*.xml
+.idea/
+*.iml
+*.zip
+notes*.pdf
+coursenotes*.pdf
+out/
