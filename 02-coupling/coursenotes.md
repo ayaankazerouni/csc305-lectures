@@ -1,6 +1,11 @@
 # 2 Coupling
 
+Coupling is the degree to which two or modules are related to/depend on each other's current implementations. In general we want _loose_ coupling (or "less" coupling). This is not unique to software; the idea is applicable to any complex systems with multiple interacting modules. 
+
+## A non-software example 
+
 Consider the design of a Formula 1 car (or really, a regular car, but Formula 1 makes the example more exciting). It's got a huge number of parts designed and built by hundreds or thousands of engineers. For example, you have:
+
 * Tyres
 * Steering wheel
 * Front/rear wings
@@ -10,17 +15,26 @@ Consider the design of a Formula 1 car (or really, a regular car, but Formula 1 
 
 Each of these modules is crucial for the car to continue functioning — the car can't turn at high speeds without a front or rear wing, it can't turn _at all_ without a steering wheel, and it certainly can't go anywhere without an engine. So all of these parts work harmoniously together to give us all that on-track action.
 
-Sometimes, these pieces may stop working as well as we need them to (e.g., if your [tyres are very old](https://www.youtube.com/watch?v=QGV3FTGUvSs), if you've bumped into the car in front and [your front wing has fallen off](https://www.youtube.com/watch?v=GKm59ktOeI0), or if the [electronics on your steering wheel aren't working any more](https://www.youtube.com/watch?v=QGV3FTGUvSs).
+Sometimes, these pieces may stop working as well as we need them to. For example, you may have a tyre puncture, or you have lost a wing of your car.
+
+Examples:
+
+* [your tyres are very old and need changing](https://www.youtube.com/watch?v=QGV3FTGUvSs)
+* [your front wing has fallen off](https://www.youtube.com/watch?v=GKm59ktOeI0)
+* [electronics on your steering wheel aren't working any more](https://www.youtube.com/watch?v=QGV3FTGUvSs).
+
+
+If these modules are _tightly coupled_ they have to change together.
+Put another way, if one module has to change, so do the others that are coupled with it, because they depend on each other's _current implementations_. To put it in terms of the car, if the gear-changing system on the steering wheel was tightly bound to the actual gearbox, Lewis Hamilton's race would have ended right there and then.
+One part needing changing would have rendered the entire system unusable. 
 
 The reason F1 pit teams are able to swap out an alarming number of parts of the car during a race is that these individual components make up mostly unrelated modules. That is, the modules are _loosely coupled_ with each other.
 
-- Coupling refers to the degree of relationship/dependency that one unit has on another
-- When modules are _tightly coupled_ they have to change together; put another way, if one module has to change, so do the others that are coupled with it, because they depend on each other's _current implementations_. To put it in terms of the car, if the gear changing system on the steering wheel was tightly bound to the actual gearbox, Lewis Hamilton's race would have ended right there and then, because one part needing changing would have rendered the entire system unacceptable
-- When modules are _loosely coupled_, they are mostly independent. This does not mean they don't work together to enable the system as a whole to function; it just means that individual modules can be updated (or even swapped out entirely!) without other modules noticing, as long as they adhere to the same _interface_. 
+When modules are _loosely coupled_, they are mostly independent. This does not mean they don't work together to enable the system as a whole to function; it just means that individual modules can be updated (or even swapped out entirely!) without other modules noticing, as long as they adhere to the same _interface_. 
 
-When I say _interface_ above, I don't (necessarily) mean the `interface` construct in object-oriented languages like Java. I mean it more generally as "the surface where two systems interact". In the F1 cars, it's whatever nuts and bolts the front wing is expected to tighten into.
+When I say _interface_ above, I don't (necessarily) mean the `interface` construct in object-oriented languages like Java. I mean it more generally as "the surface where two systems interact". In the F1 cars example, it's whatever nuts and bolts the front wing (or the new tyres, or the new steering wheel) is expected to tighten into.
 
-In software, the "interface" is made up of the public fields and functions that a module exposes. In Java, this means `public` variables and `public` methods. What happens inside those public methods cannot and should not be relied upon by clients, as long as the function's effect/result is as intended.
+In software, the "interface" is made up of the public fields and functions that a module exposes. In Java, this means `public` variables and `public` methods in classes. What happens inside those public methods cannot and should not be relied upon by clients, as long as the function's effect/result is as intended.
 
 ## Reducing coupling in software
 
@@ -84,7 +98,9 @@ public class Topic1 implements Topic {
 }
 
 public class Topic2 implements Topic {
-  System.out.println("Coupling");
+  public void understand() {
+    System.out.println("Coupling");
+  }
 }
 
 public class Subject {

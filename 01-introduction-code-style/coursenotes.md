@@ -40,7 +40,7 @@ _Effective Java, Sonarlint_
 
 **Code critique**
 
-```
+```java
 public static String delimit(String delimiter, String[] str) {
     String result = "";
     int i;
@@ -56,13 +56,13 @@ public static String delimit(String delimiter, String[] str) {
 }
 ```
 
-What do you think of this code? Is its purpose **clear**?Is the function **maintainable**?
+What do you think of this code? Is its purpose **clear**? Is the function **maintainable**?
 
 **EJ57: Minimise the scope of local variables.**
 
 The variable `i` is now only available inside the `for` loop.
 
-```
+```java
 public static String delimit(String delimiter, String[] str) {
     String result = "";
     if (str.length > 1) {
@@ -85,7 +85,7 @@ public static String delimit(String delimiter, String[] str) {
  the `new` keyword is expensive to use.
 - use `StringBuilder` instead
 
-```
+```java
 public static String delimit(String delimiter, String[] str) {
     StringBuilder result = new StringBuilder();
     if (str.length > 1) {
@@ -105,7 +105,7 @@ public static String delimit(String delimiter, String[] str) {
 
 - You may sometimes need the index variable; in those cases a regular `for` loop is fine.
 
-```
+```java
 public static String delimit(String delimiter, String[] str) {
     StringBuilder result = new StringBuilder();
     if (str.length > 1) {
@@ -127,7 +127,7 @@ public static String delimit(String delimiter, String[] str) {
 - benefit from the experts where you can
 - it's also really well documented
 
-```
+```java
 public static String delimit(String delimiter, List<String> str) {
     return String.join(delimiter, str);
 }
@@ -136,3 +136,4 @@ public static String delimit(String delimiter, String[] str) {
     return String.join(delimiter, str);
 }
 ```
+
