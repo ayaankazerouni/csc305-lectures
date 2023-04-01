@@ -1,4 +1,10 @@
-# 3 Mutability, cohesion, single-responsibility
+# 3 Mutability, SOLID principles 
+
+## Topics
+
+* A bit more about encapsulation
+* Mutability
+* Cohesion and the single responsibility principle
 
 ## A bit more on encapsulation
 
@@ -44,6 +50,8 @@ In the code above, the `String::replace` method call returns a _new_ `String` wi
 An immutable class is a class whose instances cannot be modified. You can achieve this by not providing methods that modify the instance variables of a class, and ensure that the class cannot be extended (declare it as a `final class`).
 
 **DISCUSS**: Critique the following code. The class `Person` is meant to be an immutable class.
+
+**`Person.java`**
 
 ```java
 public class Person {
@@ -93,10 +101,21 @@ public Date getDateOfBirth() {
 
 There are many benefits to creating immutable objects.
 
-* simple, easy-to-reason about code
-* concurrency
+* **Changes become visible**. You can read code and reason about the chain of events that occur from a sequence of function calls, resting assured that there were no invisible changes that occurred within those functions. This may seem like a small benefit, but it makes program comprehension significantly easier, which in turn simplifies things like debugging, contributing to an existing codebase, or refactoring.  
+* **Concurrency becomes safer**. If objects are immutable, they cannot be corrupted by competing threads. Algorithms operating on immutable objects are more easily parallelisable, since the object is guaranteed to always be in a "valid" state, i.e., it hasn't been inappropriately modified by multiple clients who are unaware of each other.
+* **Composability**. You can chain or "compose" functions together to solve larger problems. For example, consider the `String` class. Because each method returns a copy fo teh `String`, you can chain function calls:
 
-Drawbacks
+```java
+String myString = "    this is a string   ";
+System.out.println(myString.trim().toUpperCase()); // prints "THIS IS A STRING"
+```
 
-* can be costly to keep creating new objects (though this cost tends to be [overestimated](https://docs.oracle.com/javase/tutorial/essential/concurrency/immutable.html))
+While this may seem like a small benefit, when functions are defined at the right level abstraction, you can compose them to solve problems of ever-increasing complexity. For example, consider the `map`, `filter`, and `reduce` patterns.
+
+Drawbacks include performance. It can be costly to create a new Object each time some changes have to be made. This cost tends to be overstimated in most cases since optimisations in the programming language can absorb most of the cost (e.g., but not actually copying the data that doesn't change). But in programs with large, complex objects that frequently change state (e.g., in games) immutability may be too expensive to justify.
+
+## Cohesion
+
+The degree to which a module (class, function, package) has a single, well-focused responsibility. A module should _do one thing_. What does "one thing" mean in this context? It is highly dependent on the problem you're solving and abstractions you've chosen to help you.
+
 
