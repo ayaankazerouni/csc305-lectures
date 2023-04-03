@@ -34,13 +34,15 @@ Note also that the `Point` Javadoc doesn't say that it's specifically a point re
 
 When something is _mutable_, that means it is possible for it to change or be changed. In the example above, the `width` and `height` fields in the `Dimension` class are mutable, since they are not declared to be `final` fields. The same goes for the `Point` class's `x` and `y` values.
 
+This means that `Dimension` and `Point` objects are themselves mutable, since their internal state is mutable.
+
 In contrast, the `String` class is _immutable_. Once a `String` has been created, it cannot be changed.
 
 ```java
 String myString = "CSC 305 Individual Software Desine and Development";
 myString.replace("Desine", "Design");
 
-System.out.println(myString); // prints "CSC 305 Individual Software Design and Development"
+System.out.println(myString); // prints "CSC 305 Individual Software Desine and Development"
 ```
 
 In the code above, the `String::replace` method call returns a _new_ `String` with the transformation applied. If we wanted to store that new value, we would need to re-assign the `myString` variable to that returned value.
@@ -73,7 +75,8 @@ public class Person {
 }
 ```
 
-Have we successfully made it immutable? A couple of changes need to be made:
+Have we successfully made it immutable? A few changes need to be made:
+
 * If we mean for the fields to be immutable, it's good to signal that by marking them both as `final`. We haven't provided setter methods for either of the `private` vars, so this isn't a huge deal.
 * But more insidiously, the `Date` object in Java is _not_ immmutable. That means that, with access to the `dateOfBirth` reference, a client could use the mutator methods in the `Date` class to change its value! And our `Person` is no longer immutable.
   - note that marking it as `final` only prevents the `dateOfBirth` variable from being assigned a new value. it doesn't prevent one from calling mutator methods on it. 
@@ -101,21 +104,63 @@ public Date getDateOfBirth() {
 
 There are many benefits to creating immutable objects.
 
-* **Changes become visible**. You can read code and reason about the chain of events that occur from a sequence of function calls, resting assured that there were no invisible changes that occurred within those functions. This may seem like a small benefit, but it makes program comprehension significantly easier, which in turn simplifies things like debugging, contributing to an existing codebase, or refactoring.  
+* **Changes become visible**. You can read code and reason about the chain of events that occur from a sequence of function calls, resting assured that there were no invisible changes that occurred within those functions. This can make program comprehension significantly easier, which in turn simplifies things like debugging, contributing to an existing codebase, or refactoring.  
 * **Concurrency becomes safer**. If objects are immutable, they cannot be corrupted by competing threads. Algorithms operating on immutable objects are more easily parallelisable, since the object is guaranteed to always be in a "valid" state, i.e., it hasn't been inappropriately modified by multiple clients who are unaware of each other.
-* **Composability**. You can chain or "compose" functions together to solve larger problems. For example, consider the `String` class. Because each method returns a copy fo teh `String`, you can chain function calls:
+* **Composability**. You can chain or "compose" functions together to solve larger problems. For example, consider the `String` class. Because each method returns a copy of the `String`, you can chain function calls:
 
 ```java
 String myString = "    this is a string   ";
 System.out.println(myString.trim().toUpperCase()); // prints "THIS IS A STRING"
 ```
 
-While this may seem like a small benefit, when functions are defined at the right level abstraction, you can compose them to solve problems of ever-increasing complexity. For example, consider the `map`, `filter`, and `reduce` patterns.
+This may seem like a small benefit, but when functions are defined at the right level abstraction, you can compose them to solve problems of ever-increasing complexity. For example, consider the `map`, `filter`, and `reduce` patterns.
 
-Drawbacks include performance. It can be costly to create a new Object each time some changes have to be made. This cost tends to be overstimated in most cases since optimisations in the programming language can absorb most of the cost (e.g., but not actually copying the data that doesn't change). But in programs with large, complex objects that frequently change state (e.g., in games) immutability may be too expensive to justify.
+One drawback of immutability is _performance_. It can be costly to create a new Object each time some changes have to be made. This cost tends to be overstimated in most cases since optimisations in the programming language can absorb most of the cost (by not actually copying data that doesn't change, advanced garbage collection techniques, etc.). But in programs with large, complex objects that frequently change state (e.g., characters in games) immutability may be too expensive to justify.
 
 ## Cohesion
 
 The degree to which a module (class, function, package) has a single, well-focused responsibility. A module should _do one thing_. What does "one thing" mean in this context? It is highly dependent on the problem you're solving and abstractions you've chosen to help you.
 
+Why are cohesive modules good?
+
+* For starters, a module that does one thing is much easier to reason about than a module that handles several pieces of unrelated logic.
+* If functionality is appropriately isolated in a module, it becomes easier to test. That is, you can test for individual requirements without other requirements getting in the way. 
+
+For example, consider a text-based Tic Tac Toe game you're making for Lab 2. A solution with **highly cohesive** modules might have classes that handle the following responsibilities, _separately_. 
+
+* Managing the board state. 
+* Keeping track of the state of the current game. 
+* Managing the user interface. That is, handling all interactions with the user.
+* Managing communication between the UI and the game.
+
+A solution with **low cohesion** might tightly _couple_ two or more of the above modules together. For example, to handle the job
+
+> "place `X` at the top-right corner"
+
+a low-cohesion solution might place the `X` and save that information, handle the update of the user interface, and check whether the user has won the game or not. This displays low cohesion. The function is doing at least three things.
+
+
+Moreover, future changes are rendered difficult with this design. Suppose you wanted to replace the text-based user interface with a graphical user interface. Instead of swapping out the UI (like the Formula 1 pit crew swaps out the front/rear wing), you now need to fiddle with the Tic Tac Toe game logic as well.
+
+Does this all sound a lot like the arguments we made against tight _coupling_ last week? Good! The two ideas of coupling and cohesion go hand-in-hand. A way to reduce coupling between modules is to ensure that individual modules have a _single responsibility_.
+
+This is so important that this marks the first of the **SOLID** principles---a set of five principles for good software design. (The way the principles are phrased is regrettably, ahem, coupled with the object-oriented paradigm, but the ideas are broadly applicable in general software design.)
+
+Remember: **Loose Coupling, Tight Cohesion**
+
+## An example in the wild
+
+Consider the following chapter written by [James Crook](http://aosabook.org/en/intro1.html#crook-james) about the **[user interface of Audacity](http://aosabook.org/en/audacity.html)**, a popular open-source application for sound recording and mixing.
+
+The chapter is pretty long and worth a read in its entirety[^aosa], but we'll focus on section 2.4 _The TrackPanel_.
+
+[^aosa]: The book it's from&mdash;_The Architecture of Open-Source Applications_, edited by Amy Brown and Greg Wilson&mdash; is pretty cool because it contains descriptions of the designs of large mature open-source projects written by the project maintainers themselves.
+
+**DISCUSSION**: Take a moment to read the referenced section.
+
+The author is describing exactly the kind of problem we discussed with the Tic Tac Toe example. Namely, part of the user interface are deeply coupled with the domain-specific logic that is being implemented. The reasons for this choice are related to other, earlier tradeoffs regarding a third-party library (wxWidgets).
+
+The Summary section puts it nicely:
+
+> In the TrackPanel of Audacity we needed to go outside the features that could easily be got from existing widgets. As a result we rolled our own ad hoc system. There is a cleaner system with widgets and sizers and logically distinct application level objects struggling to come out of the TrackPanel.
 
