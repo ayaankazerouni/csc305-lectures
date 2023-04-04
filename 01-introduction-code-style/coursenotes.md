@@ -78,6 +78,24 @@ public static String delimit(String delimiter, String[] str) {
 }
 ```
 
+In the example below, the iterator `i` is not needed after the first `while` loop. But its scope is
+not limited to that area. This can subtle mistakes like the one below. Can you spot it?
+
+```java
+public static void example(List<Object> c, List<Object> c2) {
+    Iterator<Object> i = c.iterator();
+    while (i.hasNext()) {
+        System.out.println(i.next());
+    }
+
+    // ... Some other code.
+    Iterator<Object> i2 = c2.iterator();
+    while (i.hasNext()) {
+        System.out.println(i2.next());
+    }
+}
+```
+
 **EJ63: Beware performance of String concatenation**
 
 - `+` is a convenient way to concatenate strings
