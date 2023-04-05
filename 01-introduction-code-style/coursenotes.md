@@ -65,7 +65,7 @@ The variable `i` is now only available inside the `for` loop.
 ```java
 public static String delimit(String delimiter, String[] str) {
     String result = "";
-    if (str.length > 1) {
+    if (str.length > 0) {
         result += str[0];
     }
     
@@ -106,7 +106,7 @@ public static void example(List<Object> c, List<Object> c2) {
 ```java
 public static String delimit(String delimiter, String[] str) {
     StringBuilder result = new StringBuilder();
-    if (str.length > 1) {
+    if (str.length > 0) {
         result.append(str[0]);
     }
     
@@ -121,29 +121,16 @@ public static String delimit(String delimiter, String[] str) {
 
 **EJ58: Prefer for-each loops to traditional for loops where possible.**
 
-- You may sometimes need the index variable; in those cases a regular `for` loop is fine.
-
-```java
-public static String delimit(String delimiter, String[] str) {
-    StringBuilder result = new StringBuilder();
-    if (str.length > 1) {
-        result.append(str[0]);
-    }
-    
-    for (String current : str) {
-        result.append(delimiter);
-        result.append(current);
-    }
-
-    return result.toString();
-}
-```
+- Using a for-each loop instead of a regular for loop removes the chances of making
+off-by-one errors (e.g., ending the loop at `i <= str.length` instead of `i < str.length`)
+- You may sometimes need the index variable; in those cases a regular `for` loop is fine. The `delimit` function is an example of such a case: we need the `i` variable
+in order to tell the function to skip the first item in the list.
 
 **EJ59 Know and use the standard libraries.**
 
-- java platform has been developed over years
-- benefit from the experts where you can
-- it's also really well documented
+- The Java platform has been developed over years
+- Benefit from the experts where you can
+- It's also really well documented
 
 ```java
 public static String delimit(String delimiter, List<String> str) {
