@@ -1,5 +1,17 @@
 # 2 Coupling
 
+## Pre-class stuff
+
+Most recent CS course you've taken? 
+
+* CSC 308
+* CSC 309
+* CSC 307
+* CSC 203
+* CSC 357
+
+---
+
 Coupling is the degree to which two or modules are related to/depend on each other's current implementations. In general we want _loose_ coupling (or "less" coupling). This is not unique to software; the idea is applicable to any complex systems with multiple interacting modules. 
 
 ## A non-software example 
