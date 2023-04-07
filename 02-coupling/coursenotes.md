@@ -10,6 +10,15 @@ Most recent CS course you've taken?
 * CSC 203
 * CSC 357
 
+Java topics needing review?
+
+* Data types
+* Classes
+* Objects
+* instance vs. static
+* `this`
+* inheritance (`extends` and `implements`)
+
 ---
 
 Coupling is the degree to which two or modules are related to/depend on each other's current implementations. In general we want _loose_ coupling (or "less" coupling). This is not unique to software; the idea is applicable to any complex systems with multiple interacting modules. 
@@ -31,7 +40,7 @@ Sometimes, these pieces may stop working as well as we need them to. For example
 
 Examples:
 
-* [your tyres are very old and need changing](https://www.youtube.com/watch?v=QGV3FTGUvSs)
+* [your tyres are very old and need changing](https://www.youtube.com/watch?v=wsCriICZ-nA)
 * [your front wing has fallen off](https://www.youtube.com/watch?v=GKm59ktOeI0)
 * [electronics on your steering wheel aren't working any more](https://www.youtube.com/watch?v=QGV3FTGUvSs).
 
@@ -80,14 +89,14 @@ Often used concurrently with this strategy is another strategy called *dependenc
 ## A toy example
 
 ```java
-public class Subject {
-  private Topic topic = new Topic();
+public class src.Subject {
+  private src.Topic topic = new src.Topic();
   public void startReading() {
     t.understand();
   }
 }
 
-public class Topic {
+public class src.Topic {
   public void understand() {
     System.out.println("Coupling");
   }
@@ -96,35 +105,35 @@ public class Topic {
 
 **Introduce an interface**
 
-The `Subject` class would now not notice if the underlying `Topic` implementation changed.
+The `src.Subject` class would now not notice if the underlying `src.Topic` implementation changed.
 
 ```java
-public interface Topic {
-  void understand();
+public interface src.Topic {
+    void understand();
 }
 
-public class Topic1 implements Topic {
-  public void understand() {
-    System.out.println("Got it");
-  }
+public class Topic1 implements src.Topic {
+    public void understand() {
+        System.out.println("Got it");
+    }
 }
 
-public class Topic2 implements Topic {
-  public void understand() {
-    System.out.println("Coupling");
-  }
+public class Topic2 implements src.Topic {
+    public void understand() {
+        System.out.println("Coupling");
+    }
 }
 
-public class Subject {
-  private Topic topic;
+public class src.Subject {
+    private src.Topic topic;
 
-  public Subject(Topic topic) {
-    this.topic = topic;
-  }
+    public src.Subject(src.Topic topic) {
+        this.topic = topic;
+    }
 
-  public void startReading() {
-    this.topic.understand();
-  }
+    public void startReading() {
+        this.topic.understand();
+    }
 }
 ```
 
