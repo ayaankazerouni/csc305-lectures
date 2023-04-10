@@ -51,42 +51,57 @@ In the code above, the `String::replace` method call returns a _new_ `String` wi
 
 An immutable class is a class whose instances cannot be modified. You can achieve this by not providing methods that modify the instance variables of a class, and ensure that the class cannot be extended (declare it as a `final class`).
 
-**DISCUSS**: Critique the following code. The class `Person` is meant to be an immutable class.
+**DISCUSS**: Critique the following code. Is the `Person` class below immutable? (Clearly not; it provides mutator methods.) What woud it take to make it immutable?
 
 **`Person.java`**
 
 ```java
 public class Person {
-  private final String name;
-  private Date dateOfBirth;
+    private String name;
+    private Date dateOfBirth;
 
-  public Person(String name, Date dateOfBirth) {
-    this.name = name;
-    this.dateOfBirth = dateOfBirth;
-  }
+    public Person(String name, Date dateOfBirth) {
+        this.name = name;
+        this.dateOfBirth = dateOfBirth;
+    }
 
-  public String getName() {
-    return this.name;
-  }
+    public String getName() {
+        return this.name;
+    }
 
-  public Date getDateOfBirth() {
-    return this.dateOfBirth;
-  }
+    public Date getDateOfBirth() {
+        return this.dateOfBirth;
+    }
+
+    public void setDate(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
 ```
 
-Have we successfully made it immutable? A few changes need to be made:
+Strategies for making a class immutable:
 
-* If we mean for the fields to be immutable, it's good to signal that by marking them both as `final`. We haven't provided setter methods for either of the `private` vars, so this isn't a huge deal.
-* But more insidiously, the `Date` object in Java is _not_ immmutable. That means that, with access to the `dateOfBirth` reference, a client could use the mutator methods in the `Date` class to change its value! And our `Person` is no longer immutable.
-  - note that marking it as `final` only prevents the `dateOfBirth` variable from being assigned a new value. it doesn't prevent one from calling mutator methods on it. 
+* Make fields `private` and `final`
+* Make the class `final` (meaning it can't be extended)
+* Don't provide public mutator methods
+* And finally, you need to ensure exlucsive access to any mutable components of the class
+
+To illustrate that last point, consider that the `Date` object in Java is _not_ immutable. That means that, with access to the `dateOfBirth` reference (e.g., using the public accessor method), a client could use the mutator methods in the `Date` class to change its value! And our `Person` is no longer immutable.
+
+Marking the `dateOfBirth` as `final` only prevents it from being assigned a new value. It doesn't prevent one from calling its own mutator methods on it.
+
+This can lead to "attacks" on the `Person` class's immutability, taking advantage of the mutable nature of its internal fields. 
 
 ```java
 public static void main(String[] args) {
   Person p = new Person("Steph Curry", new Date());
 
   Date dateOfBirth = p.getDateOfBirth();
-  dateOfBirth.setTime(0);
+  dateOfBirth.setTime(0); // Steph is now born at the beginning of time.
 }
 ```
 
@@ -100,13 +115,27 @@ public Date getDateOfBirth() {
 }
 ```
 
-### What's the point of mutability?
+### What's the point of immutability?
+
+**DISCUSS** What do you think are some benefits of immutability? (Can answer in general or specifically in an object-oriented context.)
 
 There are many benefits to creating immutable objects.
 
-* **Changes become visible**. You can read code and reason about the chain of events that occur from a sequence of function calls, resting assured that there were no invisible changes that occurred within those functions. This can make program comprehension significantly easier, which in turn simplifies things like debugging, contributing to an existing codebase, or refactoring.  
-* **Concurrency becomes safer**. If objects are immutable, they cannot be corrupted by competing threads. Algorithms operating on immutable objects are more easily parallelisable, since the object is guaranteed to always be in a "valid" state, i.e., it hasn't been inappropriately modified by multiple clients who are unaware of each other.
-* **Composability**. You can chain or "compose" functions together to solve larger problems. For example, consider the `String` class. Because each method returns a copy of the `String`, you can chain function calls:
+* **Simplicity**. Immutable objects can be in exactly one state—the state in which they were created. This means that you can check invariants in the constructor for the object, and those invariants are guaranteed to hold for the lifetime of the object.
+**Changes become visible**. If changes are to be made, functions called on the object would result in the creation and return of a _new_ object. You can read code and reason about the chain of events that occur from a sequence of function calls, resting assured that there were no invisible changes that occurred within those functions. This can make program comprehension significantly easier, which in turn simplifies things like debugging, contributing to an existing codebase, or refactoring.
+* **Immutable objects are thread-safe**. If objects are immutable, they cannot be corrupted by competing threads. This means that objects can be shared among multiple threads freely. Algorithms operating on immutable objects are more easily parallelisable, since the object is guaranteed to always be in a "valid" state, i.e., it hasn't been inappropriately modified by multiple clients who are unaware of each other. 
+* **Failure atomicity**. Immutable objects guarantee _failure atomicity_. "Atomicity" is when a sequence of actions are carried out "as one". For example, consider the action of enrolling for a course at Cal Poly. There a number of steps that need to be taken to perform this "single action":
+  - Check if you meet pre-requisites
+  - Check the course capacity
+  - Get added to the course according to the registrar's rolls
+  - Get added to the course Canvas
+  - Get added to the course mailing list
+
+If the above actions were performed _atomically_, we are saying that the above actions would _all succeed_ or _all fail_. Anything in the middle can result in inconsistent states, e.g., you're added to the course Canvas, but the registrar has no idea that you're in the course.
+
+In an immutable object, we avoid the possibility of an object in an inconsistent state (e.g., in an an exception occurs halfway through a function). If a function call failed for some internal reason, the original object is left untouched. That is, the "client" either has a reference to the original object (in a valid state) or the result of a successful function call (also a valid state).
+
+* **Composability**. You can chain or "compose" abstractions (objects or functions) that have immutability together to solve larger problems. For example, consider the `String` class. Because each method returns a copy of the `String`, you can chain function calls:
 
 ```java
 String myString = "    this is a string   ";
@@ -116,6 +145,8 @@ System.out.println(myString.trim().toUpperCase()); // prints "THIS IS A STRING"
 This may seem like a small benefit, but when functions are defined at the right level abstraction, you can compose them to solve problems of ever-increasing complexity. For example, consider the `map`, `filter`, and `reduce` patterns.
 
 One drawback of immutability is _performance_. It can be costly to create a new Object each time some changes have to be made. This cost tends to be overstimated in most cases since optimisations in the programming language can absorb most of the cost (by not actually copying data that doesn't change, advanced garbage collection techniques, etc.). But in programs with large, complex objects that frequently change state (e.g., characters in games) immutability may be too expensive to justify.
+
+One strategy to manage this cost for "large" objects is to create a "companion" class that is mutable, and is used purely for the purpose of performing operations that require mutability. One example is the `StringBuilder` class.
 
 ## Cohesion
 
@@ -139,12 +170,9 @@ A solution with **low cohesion** might tightly _couple_ two or more of the above
 
 a low-cohesion solution might place the `X` and save that information, handle the update of the user interface, and check whether the user has won the game or not. This displays low cohesion. The function is doing at least three things.
 
-
 Moreover, future changes are rendered difficult with this design. Suppose you wanted to replace the text-based user interface with a graphical user interface. Instead of swapping out the UI (like the Formula 1 pit crew swaps out the front/rear wing), you now need to fiddle with the Tic Tac Toe game logic as well.
 
 Does this all sound a lot like the arguments we made against tight _coupling_ last week? Good! The two ideas of coupling and cohesion go hand-in-hand. A way to reduce coupling between modules is to ensure that individual modules have a _single responsibility_.
-
-This is so important that this marks the first of the **SOLID** principles---a set of five principles for good software design. (The way the principles are phrased is regrettably, ahem, coupled with the object-oriented paradigm, but the ideas are broadly applicable in general software design.)
 
 Remember: **Loose Coupling, Tight Cohesion**
 
@@ -154,13 +182,13 @@ Consider the following chapter written by [James Crook](http://aosabook.org/en/i
 
 The chapter is pretty long and worth a read in its entirety[^aosa], but we'll focus on section 2.4 _The TrackPanel_.
 
-[^aosa]: The book it's from&mdash;_The Architecture of Open-Source Applications_, edited by Amy Brown and Greg Wilson&mdash; is pretty cool because it contains descriptions of the designs of large mature open-source projects written by the project maintainers themselves.
+[^aosa]: It's from the book collection&mdash;_The Architecture of Open-Source Applications_, edited by Amy Brown and Greg Wilson&mdash. The books are pretty cool because they contain design descriptions of large and mature open-source projects written by the project maintainers themselves. This gives us a unique insight into the design decisions and tradeoffs that go into engineering large software.
 
 **DISCUSSION**: Take a moment to read the referenced section.
 
-The author is describing exactly the kind of problem we discussed with the Tic Tac Toe example. Namely, part of the user interface are deeply coupled with the domain-specific logic that is being implemented. The reasons for this choice are related to other, earlier tradeoffs regarding a third-party library (wxWidgets).
+The author is describing exactly the kind of problem we discussed with the Tic Tac Toe example. Namely, parts of the user interface are deeply coupled with the domain-specific logic that is being implemented. The reasons for this choice are related to other, earlier tradeoffs regarding a third-party library used in Audacity (wxWidgets).
 
 The Summary section puts it nicely:
 
-> In the TrackPanel of Audacity we needed to go outside the features that could easily be got from existing widgets. As a result we rolled our own ad hoc system. There is a cleaner system with widgets and sizers and logically distinct application level objects struggling to come out of the TrackPanel.
+> In the TrackPanel of Audacity we needed to go outside the features that could easily be got from existing widgets. As a result we rolled our own ad hoc system. **There is a cleaner system with widgets and sizers and logically distinct application level objects struggling to come out of the TrackPanel.** (emphasis mine)
 

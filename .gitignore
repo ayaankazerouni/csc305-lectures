@@ -6,7 +6,8 @@
 .idea/
 *.iml
 *.zip
-notes*.pdf
+*notes*.pdf
+*notes*.html
 coursenotes*.pdf
 coursenotes*.html
 out/
