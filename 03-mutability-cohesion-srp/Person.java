@@ -1,5 +1,5 @@
 public class Person {
-    private final String name;
+    private String name;
     private Date dateOfBirth;
 
     public Person(String name, Date dateOfBirth) {
@@ -13,5 +13,13 @@ public class Person {
 
     public Date getDateOfBirth() {
         return this.dateOfBirth;
+    }
+
+    public void setDate(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
