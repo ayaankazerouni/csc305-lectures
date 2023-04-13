@@ -35,15 +35,7 @@ The Open/Closed Principle states that software entities should be open to extens
 
 A good example is the regular expression example we saw last week. The `usePattern` function is closed to modification (i.e., we won't make changes to the function), but is open to extension (i.e., it can be extended to work with any regular expression parser, as long as it adheres to the `RegExp` interface).
 
-## Liskov substitution principle
-
-Proposed by **Barbara Liskov**, a pioneer of programming languages, object-oriented programming, and winner of the 2008 Turing award.
-
-The LSP says:
-
-> Any class `S` can be used to replace a class `B` if and only if `S` is a subclass of `B`.
-
-This is a good rule-of-thumb for using _polymorphism_ currently.
+## Polymorphism
 
 **PONDER** Do you remember what Polymorphism is? Why is it useful?
 
@@ -55,6 +47,57 @@ Polymorphism is an important pillar of object-oriented programming. The word "po
   * `default` methods allow us to add shared method implementations to interfaces. These methods are inherited by any implementing subclasses that don't implement their own versions; if `default` methods are added to interfaces that have been in use by many clients, this can lead to subtle issues at runtime, even if the client's code compiles successfully.
 * Extending a concrete class: a class extends another concrete class. Both the super-class *and* the sub-class are concrete, initialisable classes. The subclass may inherit the superclass's behaviour, modify it, or add to it.
 * Abstract classes: An abstract class can define concrete methods as well as abstract methods that *must* be implemented by a subclass.
+
+**EJ20: Prefer interfaces to abstract classes.**
+
+It used to be that interfaces were quite limited in what they could do, compared to abstract classes. Interfaces could _only_ define abstract methods that all implementing subclasses had to implement. We've already talked about the benefits of this (see lecture notes on coupling and cohesion).
+
+But this led to difficulties when, for example, an interface that was in use by many classes needed to be extended in some way. Any additions of abstract methods to the interface would require _all_ implementing subclasses to also need implementations of the new abstract methods, _even if the implementation was to be identical for all subclasses_.
+
+Compare this to abstract classes, which allow a mix of fully implemented methods as well as abstract methods. All subclasses _must_ implement their own versions of abstract methods, but have the option to inherit the methods that are already implemented in the superclass.
+
+Clearly, they seem more useful than interfaces!
+
+**Enter `default` methods**
+
+All of this changed with the introduction of `default` methods for interfaces. Default methods allow you provide implementations for certain behaviours in the interface itself, so that implementing classes can inherit them or override them.
+
+As a result, using interfaces give you the following benefits:
+
+* **Existing classes can easily be retrofitted to implement a new interface.** It's just a matter of declaring that the class `implements` the interface, and adding the required methods. Because classes in Java can implement multiple interfaces, this is not a problem. However, a Java class can `extend` at most one class. So it's not straightforward at all to retrofit an existing class to extend an abstract class.
+
+* **Interfaces let you create non-hierarchical type frameworks.** Not all organisations lend themselves to tree structures. That is, you may want different combinations of types "mixed together" for specific subclasses. To achieve this flexibly with abstract classes, you would end up with a bloated class hierarchy, trying to create a separate type for each combination of functionality you want to support. With interfaces you have infinite flexibility to enhance class behaviours as needed. 
+
+* **It's easy to enhance implementing subclasses behaviours by adding `default` methods**
+
+For example, consider the [`Comparable`](https://github.com/openjdk/jdk20/blob/master/src/java.base/share/classes/java/util/Comparator.java) interface. In older versions of Java, the interface simply provided an abstract `compare` method that compared two objects. Implementing subclasses had to implement those methods. Now, the `Comparator` interface provides a number of useful `default` methods, which allow you to chain comparators together (using `thenComparing`) or to reverse the order of a comparison (using `reversed`).
+
+No implementing classes needed to be aware of these additions to be able to benefit from them.
+
+
+That said, there are risks with `default` method implementations. Default methods are "injected" into implementing subclasses without the knowledge or consent of the implementors. It is possible that the default method implementation that is being inherited by some implementor actually violates invariants that the implementor depends upon. good documentation is absolutely essential to communicate this information to implementors.
+
+For example, a library maintainer who updated to Java 9 would suddenly have been saddled with a bunch of inherited behaviour in their classes that implement the `Comparable` interface.
+
+_It is simply not possible to write interfaces that maintains all invariants of every conceivable implementation._
+
+**EJ21 Design interfaces for posterity**
+
+The `Collection` interface contains the [`removeIf`](https://github.com/openjdk/jdk20/blob/master/src/java.base/share/classes/java/util/Collection.java#L571) method. The method removes an element if it satisfies some boolean condition (a predicate).
+
+Every class that implements the `Collection` interface (i.e., [a whole ton of classes in the JDK](https://download.java.net/java/early_access/jdk20/docs/api/java.base/java/util/Collection.html)) now inherits this `removeIf` method.
+
+Unfortunately, this fails for the `SynchronizedCollection`, a collection object from Apache commons which synchronizes the collection based on a locking object. The `default` implementation of `removeIf` in the `Collection` interface doesn't know about this locking mechanism. And the `SynchronizedCollection` cannot override the method and provide its own implementation because that would mutate the underlying collection, breaking its fundamental promise to synchronize on each function call. If a client were to call `removeIf` while another thread was modifying the collection, it would lead to a `ConcurrentModificationException` or some other undefined behaviour.
+
+## Liskov substitution principle
+
+Proposed by **Barbara Liskov**, a pioneer of programming languages, object-oriented programming, and winner of the 2008 Turing award.
+
+The LSP says:
+
+> Any class `S` can be used to replace a class `B` if and only if `S` is a subclass of `B`.
+
+This is a good rule-of-thumb for using _polymorphism_ currently.
 
 The Liskov Substitution Principle says that in an OO program, if we substitute a superclass object reference with an object of any of its subclasses, the program should not break. This is in much the same way that code that uses a `List` type can be executed with an `ArrayList` or a `LinkedList` and everything works just fine. 
 
@@ -148,4 +191,3 @@ The Composite pattern involves you treating the entire structure as a tree (much
 
 Personally, I think the above would be an indication that you shouldn't be using the Composite design pattern in the first place.
 
-TODO: Bintree example
