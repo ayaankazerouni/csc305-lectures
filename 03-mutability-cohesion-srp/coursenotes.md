@@ -2,6 +2,8 @@
 
 ## Topics
 
+* Review — what are the good programming practices we've learned about so far?
+
 * A bit more about encapsulation
 * Mutability
 * Cohesion and the single responsibility principle
@@ -12,10 +14,10 @@
 
 Different access modifiers:
 
-* `private`
-* package private (no keyword)
-* `protected`
-* `public`
+* `private` -- accessible only to the class they're in
+* package private (no keyword) -- accessible only to classes within the same package 
+* `protected` -- accessible within the same package and to subclasses 
+* `public` -- accessible to everyone
 
 Instance fields of public classes should rarely be public. Some exceptions exist, like the [`Point`](https://docs.oracle.com/en/java/javase/19/docs/api/java.desktop/java/awt/Point.html) and [`Dimension`](https://docs.oracle.com/en/java/javase/19/docs/api/java.desktop/java/awt/Dimension.html) classes in the Java standard library.A
 
@@ -88,11 +90,11 @@ Strategies for making a class immutable:
 * Make fields `private` and `final`
 * Make the class `final` (meaning it can't be extended)
 * Don't provide public mutator methods
-* And finally, you need to ensure exlucsive access to any mutable components of the class
+* And finally, you need to ensure exclusive access to any mutable components of the class
 
-To illustrate that last point, consider that the `Date` object in Java is _not_ immutable. That means that, with access to the `dateOfBirth` reference (e.g., using the public accessor method), a client could use the mutator methods in the `Date` class to change its value! And our `Person` is no longer immutable.
+What do we mean by that last point? Consider the point that the `Date` object in Java is _mutable_. That means that, with access to the `dateOfBirth` reference (e.g., using the public accessor method we provided in `Person`), a client could use `Date` class's mutator methods to change its value! This renders our `Person` no longer immutable.
 
-Marking the `dateOfBirth` as `final` only prevents it from being assigned a new value. It doesn't prevent one from calling its own mutator methods on it.
+Marking the `dateOfBirth` as `final` only prevents it from being assigned a new value. It doesn't prevent us from calling its own mutator methods on it.
 
 This can lead to "attacks" on the `Person` class's immutability, taking advantage of the mutable nature of its internal fields. 
 
@@ -109,7 +111,16 @@ public static void main(String[] args) {
 
 **EJ50 Make defensive copies of mutable objects when needed.** 
 
+This includes when we're giving others a reference to any of our internal components that happen to mutable, or when we're _using_ objects given to us by others that happen to be mutable.
+
 ```java
+public Person(String name, Date dateOfBirth) {
+    this.name = name;
+    this.dateOfBirth = new Date(dateOfBirth.getTime());
+}
+
+// ... rest of the class stays the same
+
 public Date getDateOfBirth() {
     return new Date(dateOfBirth.getTime()); 
 }
@@ -178,11 +189,13 @@ Remember: **Loose Coupling, Tight Cohesion**
 
 ## An example in the wild
 
+(we didn't get to this, but we'll talk about this on Thursday)
+
 Consider the following chapter written by [James Crook](http://aosabook.org/en/intro1.html#crook-james) about the **[user interface of Audacity](http://aosabook.org/en/audacity.html)**, a popular open-source application for sound recording and mixing.
 
 The chapter is pretty long and worth a read in its entirety[^aosa], but we'll focus on section 2.4 _The TrackPanel_.
 
-[^aosa]: It's from the book collection&mdash;_The Architecture of Open-Source Applications_, edited by Amy Brown and Greg Wilson&mdash. The books are pretty cool because they contain design descriptions of large and mature open-source projects written by the project maintainers themselves. This gives us a unique insight into the design decisions and tradeoffs that go into engineering large software.
+[^aosa]: It's from the book collection _The Architecture of Open-Source Applications_, edited by Amy Brown and Greg Wilson. The books are pretty cool because they contain design descriptions of large and mature open-source projects written by the project maintainers themselves. This gives us a unique insight into the design decisions and tradeoffs that go into engineering large software.
 
 **DISCUSSION**: Take a moment to read the referenced section.
 
