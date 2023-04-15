@@ -5,7 +5,7 @@ import java.util.List;
 
 public class BirdTest {
     public static void main(String[] args){
-        List<Bird> birdList = new ArrayList()<>();
+        List<Bird> birdList = new ArrayList<>();
         birdList.add(new Crow());
         birdList.add(new Ostrich());
         birdList.add(new Crow());

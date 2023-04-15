@@ -167,25 +167,24 @@ In 1994, a group of four authors wrote what was to become a famous book about De
 - Structural Patterns: organizing different classes and objects to form larger structures and provide new functionality
 - Creational Patterns: provide the capability to create objects based on a required criterion and in a controlled way
 
-
-Today, we're going to talk about the **Composite design pattern**, billed as a Structural pattern.[^guru]
-
-[^guru]: Much of these course notes reference the page on the [Refactoring Guru website](https://refactoring.guru/design-patterns/composite).
+Today, we're going to talk about the [**Composite design pattern**](https://refactoring.guru/design-patterns/composite), billed as a Structural pattern.
 
 The composite design pattern makes sense when a portion of your application can be structured as a tree.
 
 For example, suppose you need to "read" all the files in a computer. You have a root folder (the root of your directory tree). That root may have many children (files or folders inside of it). Some of those children may in turn have further children.
 
-The Composite pattern involves you treating the entire structure as a tree (much like your file system does). Then each "node" of the tree might have a `read` operation. For files, the `read` operation simply prints out the contents of the file. For folders, the `read` operation involves further traversing its children. This recursively continues until there are no more files to be read.
+The Composite pattern involves you treating the entire structure as a tree (much like your file system does). Then each "node" of the tree might have a `read` operation. For `FileNode`s, the `read` operation simply prints out the contents of the file. For `FolderNode`s, the `read` operation involves further traversing its children and `read`ing them. This recursively continues until there are no more files to be read.
+
+Another example that came up in class was reading the Document Object Model (DOM) (i.e., HTML files). An HTML file is made up of an `<html>` element, which holds child elements like `<head>`, `<title>`, and the `<body>`. The `<body>` element holds further children (`<div>` elements, `<p>` elements, etc.) that make up the contents you see in the webpage. Each element gets "rendered" in the browser according to certain rules (e.g., the `<div>` is a "block" element: it takes up the full width available, so that new `<div>`s would appear on a new line; whereas the `<span>` is an "inline" element: it can appear within another block).
 
 **Benefits of this pattern**
 
-- Using polymorphism and recursion, you can work with quite complex tree structures. For example, each folder doesn't need to know if its children are files or folders; they can simply be `read`, because they both belong to some supertype.
-- You can introduce new types of "nodes" in this tree conveniently, and the rest of the structure doesn't need to change. For example, consider that our filesystem has a new kind of file (say, that needs to be processed before it can be `read`). You can simply create a new subclass and implement the new `read` method
+- Using polymorphism and recursion, you can work with quite complex tree structures. For example, in the file system example each folder doesn't need to know if its children are files or folders; they can simply be `read`, because they both belong to some supertype.
+- You can introduce new types of "nodes" in this tree conveniently, and the rest of the structure doesn't need to change. For example, consider that our filesystem has a new kind of file (say, that needs to be decrypted before it can be `read`). You can simply create a new subclass `EncyrptedFileNode` and implement the new `read` method so that it gets decrypted as part of the `read` operation.
 
 **Drawbacks**
 
-* According to Refactoring Guru, this is one drawback of this pattern:
+* A commonly cited drawback of this pattern is:
 
 >  It might be difficult to provide a common interface for classes whose functionality differs too much. In certain scenarios, you’d need to overgeneralize the component interface, making it harder to comprehend.
 
