@@ -1,11 +1,11 @@
-# 05 More on design patterns: Visitor pattern and Strategy pattern 
+# 05 More on design patterns: Visitor pattern 
 
 ## Topics for today
 
 * Project 1 design discussion
 * Design patterns overview and composite design review
 * Visitor design pattern
-* Strategy design pattern 
+* Pattern matching and sealed types 
 
 ## Design patterns
 
@@ -121,4 +121,28 @@ for (Element current : this.locations) {
     current.accept(visitor);
 }
 ```
+
+### A real-world example
+
+In graduate school, I wrote code to traverse Java projects and emit some data for analysis. I used the Eclipse Java Development Tools (JDT) API to parse students' code into [Abstract Syntax Trees](https://astexplorer.net/) (ASTs), and then "visited" certain nodes of interest in these resulting trees.
+
+Because I used the JDT API to create the object structure (the AST), I only had to write the Visiting code. See [this file](https://github.com/ayaankazerouni/incremental-testing/blob/master/src/visitors/ast/MethodASTVisitor.java) as an example of a visitor.
+
+In summary, the code visits `MethodDeclarations` and `MethodInvocations`, i.e., all the places methods are defined or called in the codebase, because that's what I was interested in for that particular analysis. Some things to note:
+
+* The `MethodASTVisitor` has state of its own. It is compound object in its own right that maintains its own state across visits.
+* I am not overriding the `visit` method for _all_ possible types of nodes. That's because, unlike the example's we've talked about thus far, the `ASTVisitor` class I'm extending is not an interface, but an `abstract` class. It defines empty `visit` methods for all the different types of nodes available, and I only need to override the ones I want to use. (With the addition of `default` methods to interfaces, the `ASTVisitor` no longer needs to be an `abstract` class.)
+* The `visit` methods are returning booleans; they are not `void` methods. The structure of an `ASTNode` is such that it can be broken down further into further `ASTNode`s (much like a composite tree). The return value basically tells the objects whether they should "go further" with this visitor or end the path at this node. If everything returns `true`, then the entire AST gets visited, which may be a waste.
+
+### Visitor pattern using new, experimental Java features 
+
+In my personal opinion, the Visitor pattern is one of the more clunky design patterns to implement in Java. This is mostly due to a lack of expressive language constructs.
+
+Thankfully, _pattern matching_, a feature common in functional languages like OCaml, [is coming to Java soon](https://openjdk.org/jeps/441). The Visitor pattern can be expressed much more concisely using this language construct in addition to another new-ish feature in Java, _sealed types_.
+
+I'll go over a detailed example in class, but this (bombastically named) blog post offers a good explanation for background reading: [_Visitor Pattern Considered Pointless — Use Pattern Switches Instead_](https://nipafx.dev/java-visitor-pattern-pointless/) by Nicolai Parlog (apologies for the hard-to-read page styling).
+
+The use of pattern matching doesn't render the Visitor pattern "pointless": it just changes what it looks like in code. As we talk about more design patterns, remember that they can exist both within and without Java-specific features like interfaces and abstract classes. Design patterns are _ideas_, _templates_ to help solve or think about software problems, and they can often exist agnostic of the programming language.
+
+ 
 
