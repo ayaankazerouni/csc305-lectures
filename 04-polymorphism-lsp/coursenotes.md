@@ -103,7 +103,21 @@ The Liskov Substitution Principle says that in an OO program, if we substitute a
 
 You can think of the methods defined in a supertype as defining a contract. Every subtype (e.g., everything that claims to be a `List`) should stick to the contract.
 
-**Critique**
+The LSP helps us to ensure that invariants in the superclass are maintained in subclasses (i.e., preconditions and postconditions are satisfied). This can also help clients rely on extensions to our existing classes without fear of unexpected functional outcomes.
+
+In a language like Java, the _existence_ of the appropriate functions (e.g., methods with the right names, parameter lists, and return type) are more-or-less guaranteed by the language's type system. For example, if you were you create a new `List` implementation, your code would not compile until you had implementations for all of the methods that are required by the [`List` interface](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html).
+
+But the LSP goes beyond simply satisfying the type system. It's a promise of _semantically_ fulfilling the contract of the supertype. That is, the subtype should behave like the supertype (e.g., no matter what kind of list is being used, the effect of `add`ing an item is the same).
+
+For example, subclasses can improve the performance of the superclass:
+
+- a subclass can use a better search algorithm than the base class
+- a subclass can use a better sort algorithm than the base class
+- the expected behaviour and outcome should be the same
+
+Currently, languages do not automatically enforce these properties.
+
+**Code Critique**
 
 ```java
 public class Bird {
@@ -128,46 +142,32 @@ public class Ostrich extends Bird {
 ```java
 public class TestBird {
     public static void main(String[] args){
-        List<Bird> birdList = new ArrayList<Bird>();
+        List<Bird> birdList = new ArrayList<>();
         birdList.add(new Crow());
         birdList.add(new Ostrich());
         birdList.add(new Crow());
         letTheBirdsFly ( birdList );
     }
 
-    public static void letTheBirdsFly ( List<Bird> birdList ){
-        for ( Bird b : birdList ) {
+    public static void letTheBirdsFly (List<Bird> birdList ){
+        for (Bird b : birdList) {
             b.fly();
         }
     }
 }
 ```
 
-The LSP helps us to ensure that invariants in the superclass are maintained in subclasses (i.e., preconditions and postconditions are satisfied). This can also help clients rely on extensions to our existing classes without fear of unexpected functional outcomes.
+**What's the problem with the code above?** The Ostrich `extends` the `Bird` superclass, but does not support all of the required behaviours. This is a clear violation of the LSP: the `Ostrich` has a more constrained set of functionality than its superclass, `Bird`. This happens because the `Bird` abstraction has _too many responsibilities_. It is responsible for too much functionality, so when the time comes to extend the software with the `Ostrich` class, we run into trouble.
 
-In a language like Java, the _existence_ of the appropriate functions (e.g., methods with the right names, parameter lists, and return type) are more-or-less guaranteed by the language's type system. For example, if you were you create a new `List` implementation, your code would not compile until you had implementations for all of the methods that are required by the [`List` interface](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/util/List.html).
+**PONDER** How would you fix this design?
 
-But the LSP goes beyond simply satisfying the type system. It's a promise of _semantically_ fulfilling the contract of the supertype. That is, the subtype should behave like the supertype (e.g., no matter what kind of list is being used, the effect of `add`ing an item is the same).
-
-For example, subclasses can improve the performance of the superclass:
-
-- a subclass can use a better search algorithm than the base class
-- a subclass can use a better sort algorithm than the base class
-- the expected behaviour and outcome should be the same
-
-Currently, languages do not automatically enforce these properties.
-
-## Design Patterns
+## The composite design pattern 
 
 A **design pattern** is a general, re-usable solution to a commonly occurring problem within a given context in software design. They offer templates for how to solve problems that can be used in multiple different solutions.
 
-In 1994, a group of four authors wrote what was to become a famous book about Design Patterns (titled *Design Patterns*). The book describes three broad classes of Design Patterns:
+We'll do a more general introduction to Design patterns on Tuesday. But for now I would like to introduce the _Composite_ design pattern.
 
-- Behavorial Patterns: identifying common communication patterns between objects and realizing these patterns
-- Structural Patterns: organizing different classes and objects to form larger structures and provide new functionality
-- Creational Patterns: provide the capability to create objects based on a required criterion and in a controlled way
-
-Today, we're going to talk about the [**Composite design pattern**](https://refactoring.guru/design-patterns/composite), billed as a Structural pattern.
+Today, we're going to talk about the [**Composite design pattern**](https://refactoring.guru/design-patterns/composite).
 
 The composite design pattern makes sense when a portion of your application can be structured as a tree.
 
