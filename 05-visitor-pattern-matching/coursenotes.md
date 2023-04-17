@@ -124,7 +124,7 @@ for (Element current : this.locations) {
 
 ### A real-world example
 
-In graduate school, I wrote code to traverse Java projects and emit some data for analysis. I used the Eclipse Java Development Tools (JDT) API to parse students' code into [Abstract Syntax Trees](https://astexplorer.net/) (ASTs), and then "visited" certain nodes of interest in these resulting trees.
+A few years ago, I wrote code to traverse Java projects and emit some data for analysis. I used the Eclipse Java Development Tools (JDT) API to parse students' code into [Abstract Syntax Trees](https://astexplorer.net/) (ASTs), and then "visited" certain nodes of interest in these resulting trees.
 
 Because I used the JDT API to create the object structure (the AST), I only had to write the Visiting code. See [this file](https://github.com/ayaankazerouni/incremental-testing/blob/master/src/visitors/ast/MethodASTVisitor.java) as an example of a visitor.
 
