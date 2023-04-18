@@ -48,9 +48,9 @@ Each different type of node in the graph will need to write out its salient deta
 * The graph's primary purpose is model geographic data. An argument can be made that an XML export function would reduce the class's cohesion.
 * What if somewhere down the line we wanted to export the graph as JSON, another commonly used format for representing structured data? We would need to further modify the nodes in our graph, further exposing existing uses to potentially buggy behaviour, or even requiring further changes in clients to support the new change.
 
-The **Visitor pattern** helps us _extend_ our graph to give it XML export behaviouri, without _modifying_ it. It lets us adhere to the **Open/closed principle** (the "O" in the SOLID principles of software design).
+The **Visitor pattern** helps us _extend_ our graph to give it XML export behaviour, without _modifying_ it. It lets us adhere to the **Open/closed principle** (the "O" in the SOLID principles of software design).
 
-I like to think about the Visitor design pattern as _the Composite pattern, but from the outside of the object structure instead of inside the object structure_.
+I like to think about the Visitor design pattern as the Composite pattern, but from the _outside of the object structure_ instead of from the _inside_.
 
 A nice added benefit of not coupling your extension to the entire object structure is that you can use the Visitor pattern when some action makes sense for only _some_ objects in the larger structure, but not _all_.
 
@@ -61,7 +61,7 @@ We'll go over the basic structure of the Visitor pattern and then look at a real
 There are 5 pieces involved in implementing the visitor pattern
 
 1. **`Element`s**. these are the objects that make up the complex structure for which you want to accomplish some task. E.g., nodes in your expression tree, locations in our geographical graph, etc. Ideally, the nodes in the object structure are extensions or implementations of a common `Element` interface.
-2. The `Element` interface must have a method to "accept" a visitor, and each subtype of `Element` must implement this method.
+2. **`accept` method**. The `Element` interface must have a method to "accept" a visitor, and each subtype of `Element` must implement this method.
 
 
 ```java
@@ -80,34 +80,35 @@ public class SightseeingArea implements Element {
 } 
 ```
 
-3. **A  `Visitor` interface**. The `Visitor` has abstract (unimplemented) methods to visit each possible type of node. I.e., in the geographical graph example, the `Visitor` might look something like this:
+> **DISCUSS** If we have `default` methods in Java, why can't we fully implement the `accept` method in the `Element` interface itself? Why do we need to implement it in each concrete class?
+
+
+3. **A  `Visitor` interface**. The `Visitor` has abstract (unimplemented) methods to visit each possible type of node. That is, in the geographical graph example, the `Visitor` might look something like this:
 
 ```java
 public interface Visitor {
-  void visit(SightseeingArea node);
-  void visit(Museum node);
-  void visit(Landmark node);
-  // ... overloaded for all types of nodes 
+    void visit(SightseeingArea node);
+    void visit(Museum node);
+    void visit(Landmark node);
+    // ... overloaded for all types of nodes 
 }
 ``` 
-
-> **DISCUSS** If we have `default` methods in Java, why can't we fully implement the `accept` method in the `Element` interface itself?
 
 4. **Concrete visitor**. Now you have the machinery in place to perform _some arbitrary operation_ on _all or some nodes in an object structure_. In our running example, that "arbitrary" operation is to export the node to an XML string. We can write a concrete visitor class to do this:
 
 ```java
 public class XMLExportVisitor implements Visitor {
-  public void visit(SightseeingArea node) {
-    // export the SightseeingArea 
-  }
+    public void visit(SightseeingArea node) {
+        // export the SightseeingArea 
+    }
 
-  public void visit(Museum node) {
-    // export the Museum 
-  }
+    public void visit(Museum node) {
+        // export the Museum 
+    }
 
-  public void visit(Landmark node) {
-    // export the Museum 
-  }
+    public void visit(Landmark node) {
+        // export the Museum 
+    }
 }
 ```
 
@@ -124,15 +125,18 @@ for (Element current : this.locations) {
 
 ### A real-world example
 
-A few years ago, I wrote code to traverse Java projects and emit some data for analysis. I used the Eclipse Java Development Tools (JDT) API to parse students' code into [Abstract Syntax Trees](https://astexplorer.net/) (ASTs), and then "visited" certain nodes of interest in these resulting trees.
+A few years ago, I was conducting some analysis on the source code of a number of Java projects.
+I wrote code to read in the source code of hundreds of projects and emit some data for analysis. Using the Eclipse Java Development Tools (JDT) API, I parsed students' code into [Abstract Syntax Trees](https://astexplorer.net/) (ASTs), and then "visited" certain nodes of interest in these resulting trees.
 
 Because I used the JDT API to create the object structure (the AST), I only had to write the Visiting code. See [this file](https://github.com/ayaankazerouni/incremental-testing/blob/master/src/visitors/ast/MethodASTVisitor.java) as an example of a visitor.
 
-In summary, the code visits `MethodDeclarations` and `MethodInvocations`, i.e., all the places methods are defined or called in the codebase, because that's what I was interested in for that particular analysis. Some things to note:
+In summary, the code visits `MethodDeclarations` and `MethodInvocations`, i.e., all the places methods are defined or called in the codebase, because that's what I was interested in for that particular analysis.
 
-* The `MethodASTVisitor` has state of its own. It is compound object in its own right that maintains its own state across visits.
-* I am not overriding the `visit` method for _all_ possible types of nodes. That's because, unlike the example's we've talked about thus far, the `ASTVisitor` class I'm extending is not an interface, but an `abstract` class. It defines empty `visit` methods for all the different types of nodes available, and I only need to override the ones I want to use. (With the addition of `default` methods to interfaces, the `ASTVisitor` no longer needs to be an `abstract` class.)
-* The `visit` methods are returning booleans; they are not `void` methods. The structure of an `ASTNode` is such that it can be broken down further into further `ASTNode`s (much like a composite tree). The return value basically tells the objects whether they should "go further" with this visitor or end the path at this node. If everything returns `true`, then the entire AST gets visited, which may be a waste.
+Some things to note in this example are:
+
+* The `MethodASTVisitor` has state of its own. It's a compound object in its own right that persists some state across visits (i.e., it accumulates some data about when methods were defined and when they were invoked in test cases).
+* I am not overriding the `visit` method for _all_ possible types of nodes. ([A pretty large list.](https://help.eclipse.org/latest/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Freference%2Fapi%2Forg%2Feclipse%2Fjdt%2Fcore%2Fdom%2Fpackage-summary.html)) That's because, unlike the examples we've talked about thus far, the `ASTVisitor` class I'm extending is not an interface, but an `abstract` class. It defines empty `visit` methods for all the different types of nodes available, and I only need to override the ones I want to use. (With the addition of `default` methods to interfaces, the `ASTVisitor` no longer needs to be an `abstract` class.)
+* The `visit` methods are returning `boolean`s; they are not `void` methods. The structure of an `ASTNode` is such that it can be broken down further into further `ASTNode`s (much like a composite tree). The return value basically tells the objects whether they should "go further" with this visitor or end the path at this node. If everything returns `true`, then the entire AST gets visited, which may be a waste.
 
 ### Visitor pattern using new, experimental Java features 
 
