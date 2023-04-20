@@ -6,7 +6,6 @@ import java.util.List;
 public class StringUtils {
     /**
      * Example code from Apache commons-lang main.StringUtils library.
-     * (<a href="https://github.com/apache/commons-lang/blob/e0b474c0d/src/main/java/org/apache/commons/lang3/StringUtils.java#L8810">...</a>)
      *
      * <p>Searches a String for substrings delimited by a start and an end tag,
      * returning all matching substrings in an array.</p>

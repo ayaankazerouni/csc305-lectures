@@ -1,5 +1,6 @@
 package main;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,14 +13,18 @@ public class BigNumberCalculator {
      * @param left The left operand
      * @param right The right operand
      * @return A list of integers representing the sum of left and right
+     * @throws IllegalArgumentException if any digits in either list is < 0 or > 9
      */
     public static List<Integer> plus(List<Integer> left, List<Integer> right) {
         if (left == null || right == null)  {
             return null;
         }
 
+        left = new ArrayList<>(left);
         Collections.reverse(left);
+        right = new ArrayList<>(right);
         Collections.reverse(right);
+
         LinkedList<Integer> result = new LinkedList<>();
 
         int carry = 0;

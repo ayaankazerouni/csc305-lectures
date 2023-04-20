@@ -12,7 +12,7 @@
 ## Systematic software testing 
 
 Software failures can be costly.
-They can cost damage to people, industries, and society.
+They can cause damage to people, industries, and society.
 As soon-to-be software engineers, it behooves you to be responsible for the quality of the software you create.
 
 The most common way to do this is to test your software as you write it. All software is prone to failures. We want to
@@ -47,6 +47,7 @@ tries to convince us that the code we just wrote _must_ be correct.
 ### A systematic approach to choosing test inputs 
 
 Sources: chapters from [_Effective Software Testing_](https://www.manning.com/books/effective-software-testing) by Maurício Aniche.
+
 * Chapter 2 _Specification-based testing_
 * Chapter 3 _Structural testing_
 
@@ -60,14 +61,14 @@ it is they want you to build. What should the program do? What should it not do?
 use to demonstrate to yourself that the program does what you want it to do? (Note that the program doesn't need to exist
 yet when you perform this step.)
 
-This step is arguably the most important one. You cannot test the program effectively if you don't have a solid understanding of what it _should_ do.
+This step is arguably the most important step. You cannot test the program effectively if you don't have a solid understanding of what it _should_ do.
 
 #### 2. Explore the program
 
-This is a particularly useful step if you're testing a program that you haven't written program
+This is a particularly useful step if you're testing a program that you haven't written yourself 
 (or perhaps that you wrote a long time ago). A useful activity in this case is to trace the program yourself with specific
-inputs. Your goal is explore the program's current behaviour (then you can compare its behaviour with your understanding
-of its requirements.) Always remember that the requirements beget the program, not the other way around.
+inputs. Your goal is to explore the program's current behaviour, and perhaps compare its behaviour with your understanding
+of its requirements. Always remember that the requirements beget the program, not the other way around.
 
 #### 3. Judiciously explore possible inputs and outputs, and identify partitions
 
@@ -104,7 +105,7 @@ above, our inputs have the following preconditions and sets of possible inputs:
 
 For the `principleAmount`, the input values 0 and 1 might produce "interestingly different behaviours", and perhaps even the
 inputs 1 and 2. But the inputs 2 and 5 and 7 start to produce more-or-less the same logical behaviours. We call these
-_equivalence partitions_. You are _partitioning_ the input space into subsets of inputs that would result in logically similar
+_equivalence partitions_. You are _partitioning_ the input space into subsets of inputs, each of would result in logically distinct 
 behaviours. 
 
 This is a notoriously difficult thing to do!
@@ -130,7 +131,7 @@ public static String hipHooray(int input) {
 
 In the example above, the boundary at which the result is logically different for different inputs is the number 10. Positive
 or negative doesn't matter here. Don't fall into the trap of over-prioritising boundary values for the _data type_, and not
-for the _problem domain_.
+focusing enough on the _problem domain_.
 
 #### 6. Devise test cases
 
@@ -234,6 +235,16 @@ returning all matching substrings in an array.
 * Empty (`""`) open/close returns `null` (no match).
 
 (From the Apache commons-lang `StringUtils` class.)
+
+**Partitions**:
+
+Each of these are further broken in terms of relationships between `str`, `open`, and `close`.
+
+* Exceptional cases (`null`, `empty`) 
+* `str` length = 1
+* `str, open, close` length = 1 (mix of inputs where `str` contains `open`, `close`, both, or none)
+* `str, open, close` length > 1 (mix of inputs where `str` contains `open`, `close`, both, or none)
+* `str`
  
 ```java
 public static String[] substringsBetween(final String str, final String open, final String close) {
@@ -279,6 +290,15 @@ public static String[] substringsBetween(final String str, final String open, fi
 **Activity 2**: Use automated tests to check whether the following function is correct. There may or may not be a bug in this code. If the function is correct, say so and
 submit a screenshot of your complete branch or mutation coverage as evidence that I should believe you.
 If it's not correct, submit the test input, the expected output, and the function's _actual_ output in Canvas, along with an English description of the bug you uncovered.
+
+**Partitions**:
+
+* `left` is 0, `right` is 0, both are 0
+* `left` / `right` have single digits with no carryover
+* `left` / `right` have single digits with carryover
+* `left` has more digits than `right`
+* `right` has more digits than `left`
+* number of digits in result is more than length of max(`left`, `right`)
 
 ```java
 public static List<Integer> plus(List<Integer> left, List<Integer> right) {
