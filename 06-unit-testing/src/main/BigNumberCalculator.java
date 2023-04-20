@@ -33,7 +33,7 @@ public class BigNumberCalculator {
             int rightDigit = right.size() > i ? right.get(i) : 0;
 
             // Throw an exception if the precondition doesn't hold
-            if (leftDigit < 0 || leftDigit > 10 || rightDigit < 0 || rightDigit > 9) {
+            if (leftDigit < 0 || leftDigit > 9 || rightDigit < 0 || rightDigit > 9) {
                 throw new IllegalArgumentException();
             }
 

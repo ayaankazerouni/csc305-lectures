@@ -26,6 +26,10 @@ public class CoverageDemo {
         return SCALENE;
     }
 
+    public static int multiply(int a, int b) {
+        return a * b;
+    }
+
     /**
      * Given a list of integers representing daily inches of rainfall,
      * count the average rainfall over the given period. There are some

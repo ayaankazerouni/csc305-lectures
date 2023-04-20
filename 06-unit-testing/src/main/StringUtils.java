@@ -20,7 +20,7 @@ public class StringUtils {
      * @return a String Array of substrings, or {@code null} if no match
      */
     public static String[] substringsBetween(final String str, final String open, final String close) {
-        if (str == null || open.isEmpty() || close.isEmpty()) {
+        if (str == null || open == null || close == null || open.isEmpty() || close.isEmpty()) {
             return null;
         }
 
