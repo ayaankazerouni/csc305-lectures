@@ -110,7 +110,7 @@ behaviours.
 
 This is a notoriously difficult thing to do!
 
-#### 5. Identify the boundaries
+#### 4. Identify the boundaries
 
 For the partitions you identified in the previous step, identify the _boundaries_.
 
@@ -133,7 +133,7 @@ In the example above, the boundary at which the result is logically different fo
 or negative doesn't matter here. Don't fall into the trap of over-prioritising boundary values for the _data type_, and not
 focusing enough on the _problem domain_.
 
-#### 6. Devise test cases
+#### 5. Devise test cases
 
 This was kind of implied throughout, but at this point you should start to note down test cases based on your analysis.
 
@@ -141,8 +141,7 @@ When you've identified boundary values, you should attack those boundary points 
 point in one partition) and the "off point" (the first point in the next partition). Also test "happy path" inputs: input points
 that are squarely in one partition or another, nowhere near those pesky boundaries. Little victories are important!
 
-Do this for all combinations of inputs. (This is a good time to remind you that writing functions with fewer parameters makes
-your life easier.)
+Doing this for all combinations of inputs result in a huge number of test cases, not all of which will pay off in the long run. You need to think pragmatically about which types of tests are okay to eliminate (perhaps even at the cost of reduced code coverage). This is a good time to remind you that writing functions with fewer parameters makes your life easier.
 
 ## Automated software tests 
 
@@ -165,8 +164,7 @@ This makes it easier and safer to do a number of things in your program:
 
 * **Refactoring**: You've made a bunch of changes to the structure of your code, but you're not sure if you accidentally
 changed its behaviour in the process. No matter! Just run the tests.
-* **Debugging**: You've just spent days tracking down a bug in your code that occurred because you had made an incorrect
-assumption about the problem you were solving. You need to make sure the bug doesn't show up again because someone else
+* **Debugging**: You've just spent days tracking down a bug in your code that occurred because you had made an incorrect assumption about the problem you were solving. You need to make sure the bug doesn't show up again because someone else
 makes the same assumption. Write a test case! If someone makes the same faulty assumption you did, they'll now have a
 failing test case on their hands.
 * **Comprehension**: You've been handed a code base and you want to understand what it does in various situations. Instead
@@ -200,9 +198,7 @@ We'll do an in-class demonstration and a brief activity to get the low down on t
 What I _will_ say about these criteria is that they are NOT the final determination of your code's quality or reliability.
 
 At the end of the day both code coverage and mutation analysis are measured based entirely on your current implementation.
-If your implementation itself is incorrect (e.g., because you misunderstood the requirements or made some false assumptions),
-and your tests pass with full coverage, all that means is that your tests are also labouring under the same misunderstanding
-as your program.
+If your implementation itself is incorrect (e.g., because you misunderstood the requirements or made some false assumptions), and your tests pass with full coverage, all that means is that your tests are also labouring under the same misunderstanding as your program.
 
 ## The third artefact: the specification
 
@@ -234,7 +230,7 @@ returning all matching substrings in an array.
 * `null` open/close returns `null` (no match).
 * Empty (`""`) open/close returns `null` (no match).
 
-(From the Apache commons-lang `StringUtils` class.)
+([From the Apache commons-lang `StringUtils` class.](https://github.com/apache/commons-lang/blob/e0b474c0d015f89a52c4cf8866fa157dd89e7d1c/src/main/java/org/apache/commons/lang3/StringUtils.java#L8810)
 
 **Partitions**:
 
@@ -248,7 +244,7 @@ Each of these are further broken in terms of relationships between `str`, `open`
  
 ```java
 public static String[] substringsBetween(final String str, final String open, final String close) {
-    if (str == null || open.isEmpty() || close.isEmpty()) {
+    if (str == null || open == null || open.isEmpty() || close == null || close.isEmpty()) {
         return null;
     }
 

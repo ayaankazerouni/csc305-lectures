@@ -92,7 +92,7 @@ Now imagine a larger class with a more complex (i.e., more realistic) database s
 
 Take a look at [`InvoiceFilterTest`](https://github.com/effective-software-testing/code/blob/main/ch6/src/test/java/ch6/stub/InvoiceFilterTest.java). The amount of code you're writing is more or less the same, but without the slow DB connection and without persisting information to a database that needs to be cleared between test runs. Also, crucially, the stubbing away of the database connection means that bugs there wouldn't affect these tests. We are implicitly assuming here that the database connection has been tested in isolation as well.
 
-## To mock or not to mock 
+## To mock or not to mock? That is the question
 
 Mocking makes your tests less realistic. Your tests are relying some imaginary object that will never exist in real usage of your system. The lack of coupling between modules that you are afforded by your mock objects can actually lead you astray.
 
