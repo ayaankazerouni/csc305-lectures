@@ -3,6 +3,7 @@
 *.class
 !processing.jar
 *.xml
+!pom.xml
 .idea/
 *.iml
 *.zip
