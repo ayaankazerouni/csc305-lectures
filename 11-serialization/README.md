@@ -79,8 +79,56 @@ You'll notice that the RAF also provides methods to `readDouble`, `readChar`, et
 
 This leads us into our next topic.
 
-_Serialization_ is the conversation of an object (or some piece of data) to a byte stream. _Deserialization_ is the process of turning a byte stream back into the object (or the original piece of data).
+_Serialization_ is the conversion of an object (or some piece of data) to a byte stream. _Deserialization_ is the process of turning a byte stream back into the object (or the original piece of data).
 
 They are sometimes called _marshalling_ and _unmarshalling_. 
 
+There are many reasons why we might want to serialize data:
+
+* To transmit over the wire
+* To enable interoperability between different systems. For example, you might want to "export" a Java object so that it can be "imported" into a Python program 
+* To persist data so that it "survives" the termination of a program 
+
+Of course, there exist multiple structured data formats for exporting data to files, like JSON, XML, and YAML. Those are certainly much more friendly and human-readable than writing out raw byte streams. However, those exports tend to be much larger, since those formats use plain text to represent the data, and tend to include "extraneous" data (like colons `:`, braces `{ } [ ]`, whitespace ` `, and plain text as opposed to raw bytes). So data written out in formats like JSON tend to be more human-readable while still being structured enough to be parsed by programs, but they tend to have a larger memory footprint as well.
+
+Hence, we sometimes opt to serialize our data into raw byte streams. For example, suppose we are trying to serialize a `short` (an integer data type in Java that takes up two bytes of memory).
+
+First recognise that the short is an _abstraction_. The computer doesn't know what an integer or a short is; all it knows is how to read bits and bytes. We (humans) decide that in certain contexts, certain sequences of bits and bytes mean certain human-sensible things (like integers, booleans, or characters).
+
+So to serialise this short, our first task is become "less abstract" — we're going from the abstract human-friendly representation (the number 31543) to a less abstract representation (a byte array). We can use the `ByteBuffer` class to help with this.
+
+```
+short shortNum = 31543;
+ByteBuffer bb = ByteBuffer.allocate(2);
+bb.putShort(shortNum);
+byte[] asArray = bb.array();
+```
+
+We can now use the `RandomAccessFile` to write out this byte array.
+
+```
+// assuming we initialised the RAF
+
+randomAccessFile.write(asArray);
+```
+
+The entire `asArray` byte array has been written to the random access file. Note that this moves the pointer forwards two bytes! So any future reads will happen from that point onward. If you wanted to `read` the two bytes back into memmory, you would need to move the cursor back first.
+
+```
+// prepare the byte array into which you'll read data
+byte[] fromFile = new byte[2];
+
+// move the pointer back to where you want to start reading
+// in this case, the beginning of the file
+// if you forget to do this, your program will fail silently and subtly
+raf.seek(0);
+
+// read in fromFile.length bytes and place them in the array
+raf.read(fromFile); 
+
+// get the short back
+short num = ByteBuffer,wrap(fromFile).getShort(); 
+
+System.out.println(num); // should print 31543 
+ ```
 
