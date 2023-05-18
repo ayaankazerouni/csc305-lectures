@@ -10,17 +10,19 @@ public class Demo {
         short shortNum = 32673;
 
         try (RandomAccessFile raf = new RandomAccessFile(new File("raf.dat"), "rw")) {
+            // Allocate a new ByteBuffer
             ByteBuffer bb = ByteBuffer.allocate(2);
             bb.putShort(shortNum);
-            byte[] b = bb.array();
-            raf.write(b);
+            byte[] asArray = bb.array();
 
-            byte[] input = new byte[2];
+            raf.write(asArray);
+
+            // Reading from a RAF
+            byte[] readIn = new byte[2];
             raf.seek(0);
-            raf.read(input, 0, 2);
-            for (byte c : input) {
-                System.out.println(c);
-            }
+            int numRead = raf.read(readIn);
+            short num = ByteBuffer.wrap(readIn).getShort();
+            System.out.println(num);
         } catch (IOException e) {
             System.out.println("Cannot open this file");
         }
