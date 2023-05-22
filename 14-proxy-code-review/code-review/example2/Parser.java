@@ -6,7 +6,6 @@ import java.util.Queue;
 /**
  * The parser takes in text and validates prefix expressions as well as turns them into queues and expression trees to
  * be later evaluated
- * @author Cole Park, cpark44@calpoly.edu
  */
 public class Parser {
 
