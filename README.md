@@ -19,3 +19,5 @@
 | 6 | Buffer pools (Project 3 prep) | | OpenDSA content on [Buffer Pools](https://opendsa-server.cs.vt.edu/OpenDSA/Books/CS3notes/html/FileProc.html#buffers)
 | 7 | Guest lecture |  |  | 
 | 7 | Project 1 code review<br>Project 3 discussion | Project 3 | |
+| 8 | Project 3 milestones activity<br>Builder design pattern | | [Coursenotes](15-builder/) |
+| 8 | Streams | Lab 7 | [Coursenotes](16-streams/) |
