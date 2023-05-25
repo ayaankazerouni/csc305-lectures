@@ -212,3 +212,33 @@ In short, you cannot rely on all stream operations being executed.
 
 > A stream implementation is permitted significant latitude in optimizing the computation of the result. For example, a stream implementation is free to elide operations (or entire stages) from a stream pipeline -- and therefore elide invocation of behavioral parameters -- if it can prove that it would not affect the result of the computation. This means that side-effects of behavioral parameters may not always be executed and should not be relied upon, unless otherwise specified (such as by the terminal operations `forEach` and `forEachOrdered`).
 
+## Parallel streams
+
+As mentioned above, a Stream doesn't kick off until a terminal operation is called. So until that happens, the Stream is still being built up (using the Builder pattern), and all the intermediate operations like `map` and `filter` are being added to it.
+
+At this point the "Stream" is usually a "sequential stream". That is, it processes the data in one thread.
+However, modern computers usually have multiple cores available, meaning they can perform several actions at once. This means that some computations can be sped up if we can split up the problem (or the input data) into subsets, process those subsets, and combine the results.
+
+You can do this by turning the Stream into a Parallel Stream.
+
+Any stream can be told to operate in parallel by calling `parallel()` on it. `parallel()` is an intermediate operation. (Or, if your stream's data source is a data structure like a list, you can call `parallelStream()` on it instead of `stream()` to begin streaming).
+
+
+While this can result in a significant speedup, there are some important things to be aware of:
+
+* By default, the parallel stream will use up one less than all the available cores. This may be fine for demonstrating parallelism, but in the real world, you often want more control over how much of the computer's resources will be devoted to a task. For example, your code may be invoked programmatically by some other module, that is itself working on subproblems in parallel, and needs the ability to orchestrate thread management. **If your parallel stream kicks off a number of long-running tasks, you will soone effectively block all available threads.**
+* Parallel processing may actually be _slower_ than sequential processing in some cases. If you're not working on long-enough running tasks, or not working with enough data, then the overhead of splitting the task and combining results may outweigh any benefits of parallel processing.
+* Finally, there can be some "gotchas" while working with parallel streams. Consider the following `reduce` operation, which uses `5` as the initial value instead of the default 0.
+
+[Example from Baeldung](https://www.baeldung.com/java-when-to-use-parallel-stream)
+
+```java
+List.of(1, 2, 3, 4)
+  .parallelStream()
+  .reduce(5, Integer::sum);
+```
+
+In normal sequential application, we would get the result `5 + 1 + 2 + 3 + 4 = 15`.
+However, in a parallel stream, the `reduce` is given to each thread to handle, and `5` is added in each thread. Depending on how many threads are dedicated to this task, we will get different responses.
+
+
