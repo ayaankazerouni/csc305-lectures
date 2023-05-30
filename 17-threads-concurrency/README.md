@@ -117,5 +117,5 @@ Instead of creating a `Runnable` object, you can also create a class and directl
   * The sleep method can also be used for pacing of threads
 * `Thread::join` — an instance method that you all on a `Thread` object. If a currently running thread calls `t.join()` (where `t` is a `Thread` object), the currently running thread is made to pause execution until `t` terminates. It's a way of pacing threads without using `sleep`.
 
-Next class we'll talk about synchronising threads so they work with shared data safely and correctly.
+In the next class, we'll talk about synchronising threads so they work with shared data safely and correctly.
 
