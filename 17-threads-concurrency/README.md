@@ -49,9 +49,16 @@ Another example is your IDE — it performs syntax highlighting, compilation, So
 
 ### Memory management in threads
 
-Java programs are executed by the *Java Virtual Machine* (JVM). It's a virtual machine is able to execute Java bytecode (i.e., the format that your Java source code compiles down to). "The JVM" is really a specification detailing what a JVM should do. Different vendors might implement their JVMs separately—that's okay, as long as they adhere to the specification.
+Java programs are executed by the *Java Virtual Machine* (JVM). It's a virtual machine is able to execute Java bytecode (i.e., the format that your Java source code compiles down to). "The JVM" is really a specification detailing what a JVM implementation should do.
+Different vendors might implement their JVMs separately—that's okay, as long as they adhere to the specification.
 
-In most implementations, the JVM is run as a single process. If it is easier to think about, you can more-or-less think about "the JVM" and "your running Java program" interchangeably for the purposes of this discussion. So we will talk about how, within that process, memory is managed and shared among multiple threads owned by that process.
+In most implementations, the JVM is run as a single process. You can see the process's PID by doing the following:
+
+```java
+System.out.println(ProcessHandle.current().pid());
+``` 
+
+If it is easier to think about, you can more-or-less think about "the JVM" and "your running Java program" interchangeably for the purposes of this discussion. So we will talk about how, within that process, memory is managed and shared among multiple threads owned by that process.
 
 There are three main memory areas in the JVM:
 
@@ -115,7 +122,7 @@ Instead of creating a `Runnable` object, you can also create a class and directl
 * `Thread.sleep` — a static method that tells the current thread (whether it is the main thread or some other thread that was started later) to sleep for a specified amount of time.
   * This is a way of making processor time available to the other threads of an application that might be running on the same system
   * The sleep method can also be used for pacing of threads
-* `Thread::join` — an instance method that you all on a `Thread` object. If a currently running thread calls `t.join()` (where `t` is a `Thread` object), the currently running thread is made to pause execution until `t` terminates. It's a way of pacing threads without using `sleep`.
+* `Thread::join` — an instance method that you all on a `Thread` object. If a currently running thread calls `t.join()` (where `t` is a started `Thread` object), the currently running thread is made to pause execution until `t` terminates. It's a way of pacing threads without using `sleep`.
 
 In the next class, we'll talk about synchronising threads so they work with shared data safely and correctly.
 
