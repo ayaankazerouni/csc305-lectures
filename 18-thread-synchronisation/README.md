@@ -224,3 +224,91 @@ Each `Friend` object calls its `synchronized` `bow` method to bow to the other `
 So when Alphonse bows to Gaston, the lock on Alphonse is acquired by the first thread. When Gaston bows to Alphonse, the lock on Gaston is acquired by the second thread. Now Alphonse's thread needs access to Gaston's lock in order to make Gaston `bowBack`, and Gaston's thread needs Alphonse's lock to make Alphonse `bowBack`. Neither can progress. Legend has it they are still bowed to each other and must be fed and changed by passers by.
 
 The lesson here is: **be careful about calling other objects' `synchronized` methods from a `synchronized` method.** `synchronized` blocks of statements can help you limit which parts of a method must be `synchronized` instead of synchronizing the whole method.
+
+**Avoiding deadlock**
+
+* Avoid Nested Locks – this is the main reason for a deadlock condition.
+* Avoid Unnecessary Locks – The locks should be given to the important threads. Giving locks to unnecessary threads can cause the deadlock condition.
+* Use `Lock` objects to break deadlocks — The Java `Lock` interface represents a concurrent lock which can be used to guard against race conditions inside critical sections. I'll explain this more after a quick detour.
+
+## wait, notify, notifyAll
+
+Sometimes, we need more fine-grained conditional control over how we enter and exit critical sections.
+
+The Object class in Java contains three final methods that allows threads to communicate about the lock status of a resource.
+
+* `wait` method waits indefinitely for any other thread to call `notify` or `notifyAll` method on the object to wake up the current thread
+* `notify` method wakes up only one thread waiting on the object and that thread starts execution. The choice of the thread to wake depends on the OS implementation of thread management.
+* `notifyAll` method wakes up all the threads waiting on the object, although which one will process first depends on the OS implementation.
+
+The above methods can be called on an object to cause the current thread to pause or to wake up. They are commonly used when you want a thread to conditionally wait or execute some code.
+
+For example, consider the `BlockingQueue` data structure. It functions more or less like a regular queue, except that:
+
+* When adding something to the queue, it *waits* for the queue to be below capacity, so that the new item can be accepted
+* When something is removed from the queue, it *waits* for there to be at least one item in the queue before removing and returning it
+* When something is removed from the queue, it *notifies* the object that it's ready to accept new items (freeing up the `add` method from its waiting)
+
+An example add and remove might look like this (some of the surrounding code has been elided):
+
+```java
+public synchronized void add(T element) {
+    while (this.queue.size() == capacity) {
+        wait(); // while the queue is at capacity, this request will wait
+    }
+
+    this.queue.add(element); // once the wait is over, add the element
+    notify(); // signal to the object; use notifyAll to notify all waiting threads
+}
+
+
+public synchronized T remove() {
+    while (this.queue.isEmpty()) {
+        wait(); // while the queue is empty, wait
+    }
+
+    T item = this.queue.remove(); // when the wait is over, remove the first item
+    notify(); // notifyAll to notify all waiting threads
+    return item;
+}
+```
+
+In the `add` method, the `wait` is waiting for the queue to become below capacity, so something can be added. And the `notify` is signalling that there is something in the queue (so the `remove` method can do its thing).
+
+In the `remove` method, the `wait` is waiting for the queue to not be empty, so something can be removed. And the `notify` is signalling that something was removed, so that the `add` method can do its thing.
+
+So there are TWO "waiting conditions" and TWO signals being sent, but all of it uses the same primitive `wait` and `notify` mechanism. It's up to the programmer to manage the different states that need to wait and notify according to various conditions. Using `wait` and `notify` correctly in a complex module is notoriously difficult for this reason.
+
+## Java Lock objects
+
+The `synchronized` keyword allows a really simple kind of lock, where access to critical sections of an object's code can be restricted to one thread at a time. And the `wait`/`notify` mechanism allows conditional locking and unlocking of certain portions of the synchronized object's code.
+
+More recent Java versions include higher-level abstractions over these constructs in the form of the [`Lock`](https://download.java.net/java/early_access/valhalla/docs/api/java.base/java/util/concurrent/locks/Lock.html) interface. The simplest implementation of this interface (and the one that we'll talk about) is the [`ReentrantLock`](https://download.java.net/java/early_access/valhalla/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html). The `ReentrantLock` provides the same basic behaviour as the `synchronized` keyword, with some extended capabilities.
+
+Considering the `Counter` example above, we can rewrite the `increment` method using the `ReentrantLock` like below. Notice that we don't need to declare the method as `synchronized`; we're kind of doing the equivalent of a `synchronized` block here. 
+
+```java
+public void increment() {
+    lock.lock();
+    try {
+        int val = this.count;
+
+        Thread.sleep(1000);
+        int newVal = val + 1;
+
+        Thread.sleep(1000);
+        this.count = newVal;
+    } catch (InterruptedException e) {
+        // no-op
+    }
+    lock.unlock();
+}
+```
+
+Ok, so the `ReentrantLock` provides the same functionality as the `synchronized` block. What's the big deal?
+
+The `ReentrantLock` also has the `trylock` method, which has the following signature: `boolean trylock(long timeout, TimeUnit timeUnit)`
+
+It attempts to obtain a lock, but gives up after a specified amount of time. It returns a `boolean` value telling us if the lock was successfully obtained or not. This ability to "back out" of trying to obtain a lock helps us to avoid deadlock situations. 
+
+Go back to our Alphonse and Gaston example, and consider how you would use this newfound ability to break them out of their lifelong bows. ([Or, read the implemented example here.](https://docs.oracle.com/javase/tutorial/essential/concurrency/newlocks.html))

@@ -20,4 +20,8 @@
 | 7 | Guest lecture |  |  | 
 | 7 | Project 1 code review<br>Project 3 discussion | Project 3 | |
 | 8 | Project 3 milestones activity<br>Builder design pattern | | [Coursenotes](15-builder/) |
-| 8 | Streams | Lab 7 | [Coursenotes](16-streams/) |
+| 8 | Streams | Lab 7 (Lambdas, streams, parallel streams) | [Coursenotes](16-streams/) |
+| 9 | Processes and threads | | [Coursenotes](17-threads-concurrency/) |
+| 9 | Thread synchronization | | [Coursenotes](18-thread-synchronisation/) |
+| 10 | Mutex and Semaphore | | | 
+| 10 | Work day | | |
