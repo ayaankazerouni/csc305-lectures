@@ -1,4 +1,6 @@
-public class ThreadSleep {
+package demo;
+
+public class ThreadJoin {
     public static void main(String[] args) throws InterruptedException {
         Thread secondThread = new Thread(() -> {
             try {
@@ -9,6 +11,7 @@ public class ThreadSleep {
             System.out.println("Inside the second thread.");
         });
         secondThread.start();
+        secondThread.join();
         System.out.println("Inside the main thread.");
-    } 
+    }
 }
