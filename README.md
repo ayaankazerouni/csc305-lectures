@@ -23,5 +23,5 @@
 | 8 | Streams | Lab 7 (Lambdas, streams, parallel streams) | [Coursenotes](16-streams/) |
 | 9 | Processes and threads | | [Coursenotes](17-threads-concurrency/) |
 | 9 | Thread synchronization | | [Coursenotes](18-thread-synchronisation/) |
-| 10 | Mutex and Semaphore | | | 
+| 10 | Mutex and Semaphore | | [Coursenotes](19-mutex-semaphore) | 
 | 10 | Work day | | |
