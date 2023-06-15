@@ -6,9 +6,10 @@
 
 | Week | Topic | Assignments released | Notes |
 | -- | -- | -- | -- |
-| 1  | Intro, clean code | Lab 1 (Dev environment setup) | [Coursenotes](01-introduction-code-style/) | 1 | Coupling and encapsulation | Lab 2 (TUI tic tac toe) | [Coursenotes](02-coupling/)
+| 1  | Intro, clean code | Lab 1 (Dev environment setup) | [Coursenotes](01-introduction-code-style/) | 
+| 1 | Coupling and encapsulation | Lab 2 (TUI tic tac toe) | [Coursenotes](02-coupling/)
 | 2 | Encapsulation, immutability, cohesion | Project 1 | [Coursenotes](03-mutability-cohesion-srp/)
-| 2 | (Some of the) SOLID principles, polymorphism,<br>Composite design pattern | Lab 2 (TUI tic tac toe) | [Coursenotes](04-polymorphism-lsp/)
+| 2 | (Some of the) SOLID principles, polymorphism,<br>Composite design pattern | | [Coursenotes](04-polymorphism-lsp/)
 | 3 | Project 1 design discussion<br>Visitor design pattern<br>Java language features (sealed types, pattern matching) | | [Coursenotes](05-visitor-pattern-matching/)
 | 3 | Unit testing and test adequacy | Lab 3 (Testing) | [Coursenotes](06-unit-testing/)
 | 4 | Designing for testability (dependency injection, test doubles) | | [Coursenotes](07-designing-for-testability/)
